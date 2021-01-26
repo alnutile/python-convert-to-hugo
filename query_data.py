@@ -10,6 +10,8 @@ dotenv.load_dotenv()
 class QueryData:
 
     def __init__(self):
+        self.table = os.getenv("DB_TABLE")
+        self.tagging = os.getenv("TAGGING")
         self.conn = mysql.connector.connect(
             host=os.getenv("DB_HOST"),
             database=os.getenv("DB_NAME"),
@@ -40,7 +42,7 @@ class QueryData:
 
     def all(self):
         """ connect to db """
-        self.cursor.execute("SELECT * FROM posts")
+        self.cursor.execute(f"SELECT * FROM {self.table}")
         return self.cursor.fetchall()
 
     def get_tags(self, model_id):
@@ -56,7 +58,9 @@ class QueryData:
 
     def parse_item(self, item):
         """ pass the one item to convert """
-        tags = self.get_tags(item[0])
+        tags = None
+        if self.tagging == True:
+            tags = self.get_tags(item[0])
         model = {
             "id": item[0],
             "title": item[1],
